@@ -230,10 +230,10 @@ function do_check_indices(L, v, order, forder)
     # the tensor and the index and o is the contraction order of that
     # index. We group these tuples by the contraction order.
     order_groups = [[t for (t, o) in
-                     collect(filter(s -> s[2]==n, zip(v_pairs, v_sum)))]
+                     collect(Base.Iterators.filter(s -> s[2]==n, zip(v_pairs, v_sum)))]
                     for n in order]
     forder_groups = [[t for (t, fo) in
-                      collect(filter(s -> s[2]==n, zip(v_pairs, v_sum)))]
+                      collect(Base.Iterators.filter(s -> s[2]==n, zip(v_pairs, v_sum)))]
                      for n in forder]
     for (i, o) in enumerate(order_groups)
         if length(o) != 2
@@ -280,7 +280,7 @@ replaced by m+1. Each time this occurs, m is incremented by one. The result
 is a new Array that has no elements repeated twice, and all the new elements
 are larger than m.
 """
-function change_duplicates{T<:Number}(vA::Array{T}, m=maximum(abs(vA)))
+function change_duplicates{T<:Number}(vA::Array{T}, m=maximum(abs.(vA)))
     s = Set{T}()
     for (i, el) in enumerate(vA)
         if el in s 
@@ -300,9 +300,9 @@ function con(A, vA, B, vB)
     # tensorcontract can't handle a case where vA or vB includes a partial
     # trace (a repeated index) that is to be performed later.
     # Work around this by changing the labels if this occurs.
-    m = maximum(abs(vcat(vA, vB)))
+    m = maximum(abs.(vcat(vA, vB)))
     vA = change_duplicates(vA, m)
-    m = maximum(abs(vcat(vA, vB)))
+    m = maximum(abs.(vcat(vA, vB)))
     vB = change_duplicates(vB, m)
     # Check whether the element type of A and B can be handled by BLAS.
     if eltype(A) in blastypes && eltype(B) in blastypes
